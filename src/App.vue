@@ -1,12 +1,11 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-
   <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-6">
-        <Map name='My Map' />
+    <Navbar name='My App' />
+    <div class="row p-0 m-0 mt-0">
+      <div class="col-md-9 p-0">
+        <Map />
       </div>
-      <div class="col-md-6">
+      <div class="col-md-3">
         <GeometryForm @onAddPoint="onAddPoint" />
       </div>
     </div>
@@ -14,12 +13,14 @@
 </template>
 
 <script>
+import Navbar from './components/Navbar.vue'
 import Map from './components/Map.vue'
 import GeometryForm from './components/GeometryForm.vue'
 
 export default {
   name: 'App',
   components: {
+    Navbar,
     Map,
     GeometryForm
   },

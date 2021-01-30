@@ -1,6 +1,6 @@
 <template>
     <h3>{{name}}</h3>
-    <div id="map">lalala</div>
+    <div id="map"></div>
 </template>
 
 <script>
@@ -20,8 +20,8 @@ export default {
     },
     mounted() {
         this.emitter.on('addPoint', (data) => {
-            L.circleMarker([data.lat, data.lon]).addTo(this.points).bindPopup(data.user).openPopup();
-            this.map.fitBounds(this.points.getBounds());
+            L.circleMarker([data.lat, data.lon]).addTo(this.points).bindPopup(data.city).openPopup();
+            this.map.fitBounds(this.points.getBounds(), {maxZoom: 10});
         })
 
         this.map = L.map("map").setView([51.959, -8.623], 12);
@@ -36,7 +36,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
     #map {
-        height: 400px;
+        height: 100vh;
         width: 100%;
     }
 </style>
