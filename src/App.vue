@@ -6,7 +6,7 @@
         <Map />
       </div>
       <div class="col-md-3">
-        <GeometryForm />
+        <Form />
       </div>
     </div>
   </div>
@@ -15,14 +15,14 @@
 <script>
 import Navbar from './components/Navbar.vue'
 import Map from './components/Map.vue'
-import GeometryForm from './components/GeometryForm.vue'
+import Form from './components/Form.vue'
 
 export default {
   name: 'App',
   components: {
     Navbar,
     Map,
-    GeometryForm
+    Form
   },
   methods: {
     onAddPoint(data) {

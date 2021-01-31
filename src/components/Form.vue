@@ -13,7 +13,7 @@
 import axios from 'axios';
 
 export default {
-    name: 'GeometryForm',
+    name: 'Form',
     props: {
     },
     data() {
