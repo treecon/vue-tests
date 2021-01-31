@@ -1,28 +1,15 @@
 <template>
     <div class="form-group">
-        <label for="inputCity">city</label>
-        <input v-debounce="debounceDelay" v-model.lazy="city" type="text" class="form-control" id="inputCity">
+        <label for="inputCity">City</label>
+        <input v-model="city" type="text" class="form-control" id="inputCity">
         <ul class="list-group">
-            <li class="list-group-item" v-for="(city, index) in citiesResults" v-bind:key="city in citiesResults" @click="addToMap(index)">{{city.display_name}}</li>
+            <li class="list-group-item" v-for="(city, index) in citiesSearchResults" v-bind:key="city in citiesSearchResults" @click="addToMap(index)">{{city.display_name}}</li>
         </ul>
     </div>
-    <div class="form-group">
-        <label for="inputName">name {{user}}</label>
-        <input v-model="user" type="text" class="form-control" id="inputName">
-    </div>
-    <div class="form-group">
-        <label for="inputLat">latitude</label>
-        <input v-model="lat" type="text" class="form-control" id="inputLat">
-    </div>
-    <div class="form-group">
-        <label for="inputLon">longitude</label>
-        <input v-model="lon" type="text" class="form-control" id="inputLon">
-    </div>
-    <button @click="addToMap()" type="submit" class="btn btn-primary">Submit</button>
+    <button class="btn btn-outline-danger float-right" v-if="showClearButton" @click="onClear()">Clear Points</button>
 </template>
 
 <script>
-import debounce from 'v-debounce';
 import axios from 'axios';
 
 export default {
@@ -31,44 +18,59 @@ export default {
     },
     data() {
         return {
+            showClearButton: false,
             city: null,
-            user: null,
-            lat: null,
-            lon: null,
+            debounceTimeoutRef: null,
             debounceDelay: 400,
-            citiesResults: null
+            citiesSearchResults: null
         }
     },
     watch: {
-        city: function(value) {
-            let queryString = `https://nominatim.openstreetmap.org/search?q=${value.split(' ').join('+')}&format=json&limit=5`;
-            console.log(queryString);
-            //check axios built-in debounce method
-            axios.get(queryString)
-                .then(response => response.data)
-                .then(response => {
-                    console.log(response);
-                    this.citiesResults = response;
-                });
+        city: function(searchValue) {
+            //debounce for city search input
+            if (this.debounceTimeoutRef) {
+                clearTimeout(this.debounceTimeoutRef);
+            }
+            this.debounceTimeoutRef = setTimeout(() => {
+                this.getCitiesFromGeocodingAPI(searchValue);
+            }, this.debounceDelay);
         }
     },
     mounted() {
     },
     methods: {
-        addToMap(index) {
-            console.log(index);
-            
-            let data = {
-                city: this.citiesResults[index].display_name.split(',')[0],
-                lat: this.citiesResults[index].lat,
-                lon: this.citiesResults[index].lon
+        getCitiesFromGeocodingAPI(val) {
+            if (!val) {
+                return;
             }
-            this.citiesResults = null;
+            let queryString = `https://nominatim.openstreetmap.org/search?q=${val.split(' ').join('+')}&format=json&limit=5`;
+            
+            axios.get(queryString)
+                .then(response => response.data)
+                .then(response => {
+                    console.log(response);
+                    this.citiesSearchResults = response;
+                });
+        },
+
+        addToMap(index) {
+            let data = {
+                city: this.citiesSearchResults[index].display_name.split(',')[0],
+                lat: this.citiesSearchResults[index].lat,
+                lon: this.citiesSearchResults[index].lon
+            };
+            this.citiesSearchResults = null;
+            this.showClearButton = true;
 
             this.emitter.emit('addPoint', data);
+            this.city = null;
+        },
+
+        onClear() {
+            this.emitter.emit('clearPoints');
+            this.showClearButton = false;
         }
-    },
-    directives: {debounce}
+    }
 }
 </script>
 
